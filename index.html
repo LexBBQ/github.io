@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的数字手账笔记</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #f9d5cc;
+            --secondary-color: #f8a8a8;
+            --accent-color: #ff7b54;
+            --text-color: #5a3d2b;
+            --light-color: #fff9f0;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'ZCOOL QingKe HuangYou', cursive;
+            background-color: #f5f0e5;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23f8a8a8' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .header-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 3.5rem;
+            color: var(--accent-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin: 20px 0;
+            letter-spacing: 3px;
+        }
+        
+        .notebook {
+            background-color: var(--light-color);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            min-height: 500px;
+            background-image: linear-gradient(to bottom, #fff9f0 0%, #fff9f0 98%, #f0e6d6 100%);
+            background-size: 100% 30px;
+            background-position: 0 0;
+        }
+        
+        .notebook::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50px;
+            width: 2px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent,
+                transparent 24px,
+                #f0e6d6 24px,
+                #f0e6d6 30px
+            );
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .tab:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .note-list {
+            list-style: none;
+        }
+        
+        .note-item {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            position: relative;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .note-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .note-title {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        
+        .note-date {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        
+        .note-content {
+            font-size: 1.1rem;
+        }
+        
+        .editor-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .editor, .preview {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 400px;
+            padding: 15px;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            font-family: 'ZCOOL QingKe HuangYou', cursive;
+            font-size: 1.1rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            resize: vertical;
+        }
+        
+        .preview {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--primary-color);
+            overflow-y: auto;
+            height: 400px;
+        }
+        
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'ZCOOL QingKe HuangYou', cursive;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background-color: var(--accent-color);
+        }
+        
+        .sticker {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 10;
+        }
+        
+        .sticker-1 {
+            top: 20px;
+            right: 20px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23ff7b54"/><circle cx="35" cy="40" r="5" fill="white"/><circle cx="65" cy="40" r="5" fill="white"/><path d="M30,70 Q50,80 70,70" stroke="white" stroke-width="5" fill="none"/></svg>');
+        }
+        
+        .sticker-2 {
+            bottom: 30px;
+            left: 30px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="50,10 80,90 20,90" fill="%23f8a8a8"/><circle cx="50" cy="40" r="10" fill="white"/></svg>');
+        }
+        
+        .sticker-3 {
+            top: 100px;
+            left: 50px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23f9d5cc"/><circle cx="30" cy="40" r="8" fill="%235a3d2b"/><circle cx="70" cy="40" r="8" fill="%235a3d2b"/><path d="M30,70 Q50,60 70,70" stroke="%235a3d2b" stroke-width="5" fill="none"/></svg>');
+        }
+        
+        .instructions {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border: 2px dashed var(--primary-color);
+        }
+        
+        .instructions h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+            }
+            
+            .header-title {
+                font-size: 2.5rem;
+            }
+            
+            .notebook {
+                padding: 20px 15px 20px 40px;
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="header-title">我的数字手账笔记</h1>
+            <p>记录生活点滴，珍藏美好回忆</p>
+        </header>
+        
+        <div class="notebook">
+            <div class="sticker sticker-1"></div>
+            <div class="sticker sticker-2"></div>
+            <div class="sticker sticker-3"></div>
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="notes">我的笔记</div>
+                <div class="tab" data-tab="new">写新笔记</div>
+                <div class="tab" data-tab="about">关于</div>
+            </div>
+            
+            <div class="tab-content active" id="notes-content">
+                <h2>最近的笔记</h2>
+                <ul class="note-list">
+                    <li class="note-item">
+                        <div class="note-title">春日漫步</div>
+                        <div class="note-date">2023年4月15日</div>
+                        <div class="note-content">今天天气真好，公园里的樱花都开了，粉色的花瓣随风飘落，像下了一场樱花雨...</div>
+                    </li>
+                    <li class="note-item">
+                        <div class="note-title">读书笔记 - 《平凡的世界》</div>
+                        <div class="note-date">2023年4月10日</div>
+                        <div class="note-content">路遥的这部作品展现了普通人在大时代历史进程中所走过的艰难曲折的道路...</div>
+                    </li>
+                    <li class="note-item">
+                        <div class="note-title">烘焙尝试：抹茶蛋糕</div>
+                        <div class="note-date">2023年4月5日</div>
+                        <div class="note-content">第一次尝试做抹茶蛋糕，虽然外观不太完美，但味道还不错。下次需要调整烘烤时间...</div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="tab-content" id="new-content">
+                <h2>创建新笔记</h2>
+                <div class="editor-container">
+                    <div class="editor">
+                        <textarea id="markdown-editor" placeholder="在这里输入你的笔记（支持Markdown语法）..."># 新笔记标题
+
+## 日期
+2023年4月20日
+
+## 内容
+在这里写下你的想法、感受或笔记...
+
+- 使用Markdown格式
+- 支持**粗体**、*斜体*
+- 可以创建列表
+- 添加[链接](https://example.com)
+- 插入图片: ![描述](图片地址)
+
+> 引用内容也很方便</textarea>
+                        <button class="btn" id="save-btn"><i class="fas fa-save"></i> 保存笔记</button>
+                    </div>
+                    <div class="preview" id="markdown-preview"></div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="about-content">
+                <h2>关于这个手账笔记网站</h2>
+                <p>这是一个基于GitHub Pages的免费手账风格笔记网站，让你可以在线记录日记、笔记和想法。</p>
+                <p><strong>特点：</strong></p>
+                <ul>
+                    <li>手账风格的视觉设计</li>
+                    <li>支持Markdown格式</li>
+                    <li>响应式设计，适配各种设备</li>
+                    <li>完全免费，基于GitHub Pages</li>
+                </ul>
+                <p>要使用这个网站，只需将整个项目上传到你的GitHub仓库，然后启用GitHub Pages功能即可。</p>
+                <p>你可以自由修改和定制这个网站，添加更多功能以满足你的需求。</p>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>如何使用这个网站？</h3>
+            <ol>
+                <li>点击"写新笔记"标签创建新笔记</li>
+                <li>在左侧编辑区使用Markdown格式编写内容</li>
+                <li>右侧会实时预览渲染效果</li>
+                <li>点击"保存笔记"按钮保存内容（演示功能）</li>
+                <li>在实际使用中，你需要添加后端功能来存储笔记</li>
+            </ol>
+            <p><strong>提示：</strong> 这是一个纯前端演示，实际使用时需要添加后端存储功能。</p>
+        </div>
+    </div>
+
+    <script>
+        // 切换标签页
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有active类
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // 添加active类到当前标签
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+            });
+        });
+        
+        // Markdown预览
+        const editor = document.getElementById('markdown-editor');
+        const preview = document.getElementById('markdown-preview');
+        
+        function updatePreview() {
+            preview.innerHTML = marked.parse(editor.value);
+        }
+        
+        editor.addEventListener('input', updatePreview);
+        
+        // 初始化预览
+        updatePreview();
+        
+        // 保存按钮（演示功能）
+        document.getElementById('save-btn').addEventListener('click', () => {
+            alert('笔记已保存（演示功能）！在实际应用中，这里会调用后端API保存数据。');
+        });
+        
+        // 笔记点击效果
+        document.querySelectorAll('.note-item').forEach(note => {
+            note.addEventListener('click', () => {
+                alert('在实际应用中，点击笔记会打开详细内容页面。');
+            });
+        });
+    </script>
+</body>
+</html>
